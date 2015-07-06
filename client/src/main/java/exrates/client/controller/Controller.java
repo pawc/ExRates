@@ -1,6 +1,7 @@
 package exrates.client.controller;
 
 import java.sql.Statement;
+import java.text.DecimalFormat;
 
 import exrates.client.model.Record;
 
@@ -133,7 +134,7 @@ public class Controller {
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
             
-            String Query = "SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY DATA DESC LIMIT 30";
+            String Query = "WITH t AS (SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY data DESC LIMIT 20) SELECT * FROM t ORDER BY data ASC;";
             
             ResultSet rs = stmt.executeQuery(Query);
             while(rs.next()){
@@ -164,12 +165,7 @@ public class Controller {
           yAxis = new NumberAxis();
           
           series1 = new XYChart.Series<String, Number>();
-          /*
-          series1.getData().add(new XYChart.Data<String, Number>("raz", 22));
-          series1.getData().add(new XYChart.Data<String, Number>("dwa", 25));
-          series1.getData().add(new XYChart.Data<String, Number>("trzy", 23));
-          series1.getData().add(new XYChart.Data<String, Number>("cztery", 30));
-          */
+          
           lineChart.getData().addAll(series1);
       }
 

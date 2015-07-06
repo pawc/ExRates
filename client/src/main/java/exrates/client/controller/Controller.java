@@ -138,7 +138,7 @@ public class Controller {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data";
+            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data LIMIT 5";
             //String Query = "WITH t AS (SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY data DESC LIMIT 10) SELECT * FROM t ORDER BY data ASC;";
             
             ResultSet rs = stmt.executeQuery(Query);
@@ -159,11 +159,6 @@ public class Controller {
                 
                 series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
                 
-                xAxis.setAutoRanging(true);
-                yAxis.setAutoRanging(true);
-                
-                xAxis.autoRangingProperty().set(true);
-                yAxis.autoRangingProperty().set(true);
                 
                 
             }
@@ -184,14 +179,8 @@ public class Controller {
           yAxis = new NumberAxis();
           
           series1 = new XYChart.Series<String, Number>();
-          
-          xAxis.setAutoRanging(true);
-          yAxis.setAutoRanging(true);
-          
-          xAxis.autoRangingProperty().set(true);
-          yAxis.autoRangingProperty().set(true);
          
-         
+          
           lineChart.getData().addAll(series1);
           
       }

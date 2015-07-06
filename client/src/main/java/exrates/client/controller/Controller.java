@@ -7,20 +7,41 @@ import exrates.client.model.Record;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+
 
 public class Controller {
     
     public ObservableList<Record> observableList;
+    
+  
+    @FXML
+    public CategoryAxis xAxis;
+    
+    @FXML
+    public NumberAxis yAxis;
+    
+    @FXML
+    public MenuItem delete;
+    
+    @FXML
+    public LineChart<String, Number> lineChart;
+    
     
     @FXML
     public TableView table;
@@ -31,14 +52,24 @@ public class Controller {
     
     public void initialize(){
         
+        
         observableList = FXCollections.observableArrayList();
         constructCurrencyList();
         constructTable();
+        createLineChart();
         
         
         list.setOnMouseClicked(event->{
             SelectionModel<String> selected = list.getSelectionModel();
             resolveQuery(selected.getSelectedItem());
+        });
+        
+        delete.setOnAction(event->{
+            Stage stage = (Stage) list.getScene().getWindow();
+            Scene scene = new Scene(lineChart);
+            stage.setScene(scene);
+            stage.show();
+            
         });
       
     }
@@ -46,7 +77,7 @@ public class Controller {
     
     public void constructTable(){
         
-      //tworzenie kolumn
+        //tworzenie kolumn
         TableColumn symbolCol = new TableColumn("Symbol");
         TableColumn dateCol = new TableColumn("Date");
         TableColumn timeCol = new TableColumn("Time");
@@ -121,5 +152,26 @@ public class Controller {
             System.out.println(e.toString());
         }
     }
+    
+   
+
+      public void createLineChart(){
+          
+          xAxis = new CategoryAxis();
+          yAxis = new NumberAxis();
+          
+          lineChart = new LineChart<String, Number>(xAxis, yAxis);
+          
+          XYChart.Series<String, Number> series1 = new XYChart.Series<String, Number>();
+          
+          series1.getData().add(new XYChart.Data<String, Number>("raz", 22));
+          series1.getData().add(new XYChart.Data<String, Number>("dwa", 25));
+          series1.getData().add(new XYChart.Data<String, Number>("trzy", 23));
+          series1.getData().add(new XYChart.Data<String, Number>("cztery", 30));
+          
+          lineChart.getData().addAll(series1);
+      }
+
+    
 
 }

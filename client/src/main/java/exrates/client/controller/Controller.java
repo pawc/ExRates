@@ -127,16 +127,22 @@ public class Controller {
     public void resolveQuery(String inputSymbol){
         
         observableList.clear();
+        lineChart.setAnimated(false);
         series1.getData().clear();
+        lineChart.setAnimated(true);
+        
+        Double min =(double) 0;
+        Double max =(double) 0;
 
         try{
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            
-            String Query = "WITH t AS (SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY data DESC LIMIT 20) SELECT * FROM t ORDER BY data ASC;";
+            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data";
+            //String Query = "WITH t AS (SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY data DESC LIMIT 10) SELECT * FROM t ORDER BY data ASC;";
             
             ResultSet rs = stmt.executeQuery(Query);
+            int i = 1;
             while(rs.next()){
                 String symbol = rs.getString(1);
                 String kurs = rs.getString(2);
@@ -149,8 +155,14 @@ public class Controller {
                 
                 Record record = new Record(symbol, kursInverted, data, czas, nazwa);
                 observableList.add(record);
-                series1.getData().add(new XYChart.Data<String, Number>(data+", "+czas, kursInverted));
+                
+                
+                series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
+                i++;
             }
+            
+            
+            
         }
         catch(Exception e){
             System.out.println(e.toString());
@@ -166,7 +178,11 @@ public class Controller {
           
           series1 = new XYChart.Series<String, Number>();
           
+          xAxis.setAutoRanging(true);
+          yAxis.setAutoRanging(true);
+         
           lineChart.getData().addAll(series1);
+          
       }
 
     

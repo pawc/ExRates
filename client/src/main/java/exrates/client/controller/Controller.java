@@ -158,7 +158,14 @@ public class Controller {
                 
                 
                 series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
-                i++;
+                
+                xAxis.setAutoRanging(true);
+                yAxis.setAutoRanging(true);
+                
+                xAxis.autoRangingProperty().set(true);
+                yAxis.autoRangingProperty().set(true);
+                
+                
             }
             
             
@@ -180,6 +187,10 @@ public class Controller {
           
           xAxis.setAutoRanging(true);
           yAxis.setAutoRanging(true);
+          
+          xAxis.autoRangingProperty().set(true);
+          yAxis.autoRangingProperty().set(true);
+         
          
           lineChart.getData().addAll(series1);
           

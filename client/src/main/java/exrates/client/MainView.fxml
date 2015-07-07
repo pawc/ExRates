@@ -8,7 +8,7 @@
 
 <BorderPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="exrates.client.controller.Controller">
    <right>
-      <ListView fx:id="list" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="listRight" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
    </right>
    <center>
       <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -17,22 +17,6 @@
          </columnResizePolicy>
       </TableView>
    </center>
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem fx:id="close" mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem fx:id="about" mnemonicParsing="false" text="about" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
    <bottom>
       <LineChart fx:id="lineChart" BorderPane.alignment="CENTER">
         <xAxis>
@@ -46,4 +30,20 @@
    <left>
       <ListView fx:id="listLeft" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
    </left>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="close" mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem fx:id="about" mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
 </BorderPane>

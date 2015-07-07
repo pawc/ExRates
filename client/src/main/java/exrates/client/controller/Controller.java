@@ -51,9 +51,6 @@ public class Controller {
     public NumberAxis yAxis;
     
     @FXML
-    public MenuItem delete;
-    
-    @FXML
     public LineChart<String, Number> lineChart;
     
     
@@ -61,7 +58,7 @@ public class Controller {
     public TableView table;
     
     @FXML
-    public ListView list;
+    public ListView listRight;
    
     @FXML
     public ListView listLeft;
@@ -75,19 +72,18 @@ public class Controller {
         createLineChart();
         
         
-        list.setOnMouseClicked(event->{
-            SelectionModel<String> selected = list.getSelectionModel();
+        listRight.setOnMouseClicked(event->{
+            SelectionModel<String> selected = listRight.getSelectionModel();
             SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
             resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
         });
         
         listLeft.setOnMouseClicked(event->{
-            SelectionModel<String> selected = list.getSelectionModel();
+            SelectionModel<String> selected = listRight.getSelectionModel();
             SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
             resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
         });
         
-        //about = new MenuItem("About");
         about.setOnAction(event->{
             AnchorPane anchorPane = null;
             try {
@@ -131,9 +127,7 @@ public class Controller {
         rateCol.setCellValueFactory(new PropertyValueFactory<Record,Double>("Rate"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Name"));
         
-        //stworzenie i wypełnienie obserable list
-       
-       //powiązanie tabeli z observable list
+        //powiązanie tabeli z observable list
         table.setItems(observableList);
         
     }
@@ -155,7 +149,7 @@ public class Controller {
             System.out.println("SQL error: "+e.toString() );
        }
         
-        list.setItems(currencyList);
+        listRight.setItems(currencyList);
         listLeft.setItems(currencyList);
     }
     
@@ -166,10 +160,6 @@ public class Controller {
         series1.getData().clear();
         series2.getData().clear();
         lineChart.setAnimated(true);
-        
-        
-        Double min =(double) 0;
-        Double max =(double) 0;
 
         try{
             Class.forName("org.postgresql.Driver");
@@ -179,7 +169,7 @@ public class Controller {
             
             ResultSet rs = stmt.executeQuery(Query);
             
-            series1.setName(inputSymbol);
+            
             
             while(rs.next()){
                 String symbol = rs.getString(1);
@@ -197,6 +187,7 @@ public class Controller {
                 
                 series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
              }
+            
             rs.close();
             stmt.close();
             
@@ -204,8 +195,6 @@ public class Controller {
             String Query2 = "SELECT * FROM Pln WHERE symbol='"+inputSymbol2+"'ORDER BY data";
             
             ResultSet rs2 = stmt2.executeQuery(Query2);
-            
-            series2.setName(inputSymbol2);
             
             while(rs2.next()){
                 String symbol = rs2.getString(1);
@@ -226,6 +215,9 @@ public class Controller {
             rs2.close();
             stmt2.close();
             
+            series2.setName(inputSymbol2);
+            series1.setName(inputSymbol);
+            
         }
         catch(Exception e){
             System.out.println(e.toString());
@@ -243,7 +235,7 @@ public class Controller {
           series2 = new XYChart.Series<String, Number>();
          
           
-          lineChart.getData().addAll(series1, series2);
+          lineChart.getData().addAll(series2, series1);
           
       }
 

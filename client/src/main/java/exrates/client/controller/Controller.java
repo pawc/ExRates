@@ -3,6 +3,7 @@ package exrates.client.controller;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 
+import exrates.client.Client;
 import exrates.client.model.Record;
 
 import java.sql.Connection;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -23,6 +25,8 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
@@ -31,6 +35,14 @@ public class Controller {
     public ObservableList<Record> observableList;
     
     public XYChart.Series<String, Number> series1;
+    
+    public XYChart.Series<String, Number> series2;
+    
+    @FXML
+    public MenuItem close;
+    
+    @FXML
+    public MenuItem about;
   
     @FXML
     public CategoryAxis xAxis;
@@ -51,6 +63,8 @@ public class Controller {
     @FXML
     public ListView list;
    
+    @FXML
+    public ListView listLeft;
     
     public void initialize(){
         
@@ -63,17 +77,37 @@ public class Controller {
         
         list.setOnMouseClicked(event->{
             SelectionModel<String> selected = list.getSelectionModel();
-            resolveQuery(selected.getSelectedItem());
+            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
+            resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
         });
         
-        delete.setOnAction(event->{
-            Stage stage = (Stage) list.getScene().getWindow();
-            Scene scene = new Scene(lineChart);
+        listLeft.setOnMouseClicked(event->{
+            SelectionModel<String> selected = list.getSelectionModel();
+            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
+            resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
+        });
+        
+        //about = new MenuItem("About");
+        about.setOnAction(event->{
+            AnchorPane anchorPane = null;
+            try {
+                anchorPane = FXMLLoader.load(Client.class.getResource("About.fxml"));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            Scene scene = new Scene(anchorPane);
+            Stage stage = new Stage();
+            stage.setTitle("About");
             stage.setScene(scene);
             stage.show();
-            
         });
-      
+        
+        close.setOnAction(event->{
+            System.exit(0);
+        });
+        
     }
     
     
@@ -122,14 +156,17 @@ public class Controller {
        }
         
         list.setItems(currencyList);
+        listLeft.setItems(currencyList);
     }
     
-    public void resolveQuery(String inputSymbol){
+    public void resolveQuery(String inputSymbol, String inputSymbol2){
         
         observableList.clear();
         lineChart.setAnimated(false);
         series1.getData().clear();
+        series2.getData().clear();
         lineChart.setAnimated(true);
+        
         
         Double min =(double) 0;
         Double max =(double) 0;
@@ -138,11 +175,12 @@ public class Controller {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data LIMIT 5";
-            //String Query = "WITH t AS (SELECT * FROM pln WHERE symbol='"+inputSymbol+"' ORDER BY data DESC LIMIT 10) SELECT * FROM t ORDER BY data ASC;";
+            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data";
             
             ResultSet rs = stmt.executeQuery(Query);
-            int i = 1;
+            
+            series1.setName(inputSymbol);
+            
             while(rs.next()){
                 String symbol = rs.getString(1);
                 String kurs = rs.getString(2);
@@ -158,12 +196,35 @@ public class Controller {
                 
                 
                 series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
-                
-                
-                
-            }
+             }
+            rs.close();
+            stmt.close();
             
+            Statement stmt2 = conn.createStatement();
+            String Query2 = "SELECT * FROM Pln WHERE symbol='"+inputSymbol2+"'ORDER BY data";
             
+            ResultSet rs2 = stmt2.executeQuery(Query2);
+            
+            series2.setName(inputSymbol2);
+            
+            while(rs2.next()){
+                String symbol = rs2.getString(1);
+                String kurs = rs2.getString(2);
+                String data = rs2.getString(3);
+                String czas = rs2.getString(4);
+                String nazwa = rs2.getString(5);
+                
+                Double kursInverted = Double.parseDouble(kurs);
+                kursInverted = 1/kursInverted;
+                
+                Record record = new Record(symbol, kursInverted, data, czas, nazwa);
+                observableList.add(record);
+                
+                
+                series2.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
+             }
+            rs2.close();
+            stmt2.close();
             
         }
         catch(Exception e){
@@ -179,9 +240,10 @@ public class Controller {
           yAxis = new NumberAxis();
           
           series1 = new XYChart.Series<String, Number>();
+          series2 = new XYChart.Series<String, Number>();
          
           
-          lineChart.getData().addAll(series1);
+          lineChart.getData().addAll(series1, series2);
           
       }
 

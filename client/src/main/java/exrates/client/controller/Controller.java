@@ -39,6 +39,9 @@ public class Controller {
     public XYChart.Series<String, Number> series2;
     
     @FXML
+    public MenuItem clear;
+    
+    @FXML
     public MenuItem close;
     
     @FXML
@@ -79,9 +82,9 @@ public class Controller {
         });
         
         listLeft.setOnMouseClicked(event->{
-            SelectionModel<String> selected = listRight.getSelectionModel();
+            SelectionModel<String> selectedRight = listRight.getSelectionModel();
             SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
-            resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
+            resolveQuery(selectedRight.getSelectedItem(), selectedLeft.getSelectedItem());
         });
         
         about.setOnAction(event->{
@@ -102,6 +105,20 @@ public class Controller {
         
         close.setOnAction(event->{
             System.exit(0);
+        });
+        
+        clear.setOnAction(event->{
+            SelectionModel<String> selectedRight = listRight.getSelectionModel();
+            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
+            selectedRight.clearSelection();
+            selectedLeft.clearSelection();
+            observableList.clear();
+            lineChart.setAnimated(false);
+            series1.getData().clear();
+            series2.getData().clear();
+            lineChart.setAnimated(true);
+            
+            
         });
         
     }

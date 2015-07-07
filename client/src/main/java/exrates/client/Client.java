@@ -15,7 +15,7 @@ public class Client extends Application {
 	public void start(Stage primaryStage) throws IOException {
 	    
 	    BorderPane borderPane = FXMLLoader.load(Client.class.getResource("MainView.fxml"));
-	    primaryStage.setTitle("ExRates PLN");
+	    primaryStage.setTitle("ExRates PLN - exchange rates of polish currency - updated every 12 hours");
 	    Scene scene = new Scene(borderPane);
 	    primaryStage.setScene(scene);
 	    primaryStage.show();

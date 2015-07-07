@@ -38,6 +38,11 @@
               <MenuItem fx:id="close" mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="Selection">
+              <items>
+                <MenuItem fx:id="clear" mnemonicParsing="false" text="Clear" />
+              </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
               <MenuItem fx:id="about" mnemonicParsing="false" text="About" />

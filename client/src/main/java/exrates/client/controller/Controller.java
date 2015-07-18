@@ -34,10 +34,6 @@ public class Controller {
     
     public ObservableList<Record> observableList;
     
-    public XYChart.Series<String, Number> series1;
-    
-    public XYChart.Series<String, Number> series2;
-    
     @FXML
     public MenuItem clear;
     
@@ -61,10 +57,8 @@ public class Controller {
     public TableView table;
     
     @FXML
-    public ListView listRight;
-   
-    @FXML
-    public ListView listLeft;
+    public ListView list;
+
     
     public void initialize(){
         
@@ -74,17 +68,9 @@ public class Controller {
         constructTable();
         createLineChart();
         
-        
-        listRight.setOnMouseClicked(event->{
-            SelectionModel<String> selected = listRight.getSelectionModel();
-            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
-            resolveQuery(selected.getSelectedItem(), selectedLeft.getSelectedItem());
-        });
-        
-        listLeft.setOnMouseClicked(event->{
-            SelectionModel<String> selectedRight = listRight.getSelectionModel();
-            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
-            resolveQuery(selectedRight.getSelectedItem(), selectedLeft.getSelectedItem());
+        list.setOnMouseClicked(event->{
+            SelectionModel<String> selected = list.getSelectionModel();
+            resolveQuery(selected.getSelectedItem());
         });
         
         about.setOnAction(event->{
@@ -106,12 +92,10 @@ public class Controller {
         close.setOnAction(event->{
             System.exit(0);
         });
-        
+        /*
         clear.setOnAction(event->{
-            SelectionModel<String> selectedRight = listRight.getSelectionModel();
-            SelectionModel<String> selectedLeft = listLeft.getSelectionModel();
-            selectedRight.clearSelection();
-            selectedLeft.clearSelection();
+            SelectionModel<String> selected = list.getSelectionModel();
+            selected.clearSelection();
             observableList.clear();
             lineChart.setAnimated(false);
             series1.getData().clear();
@@ -120,7 +104,7 @@ public class Controller {
             
             
         });
-        
+        */
     }
     
     
@@ -165,19 +149,20 @@ public class Controller {
         catch(Exception e){
             System.out.println("SQL error: "+e.toString() );
        }
-        
-        listRight.setItems(currencyList);
-        listLeft.setItems(currencyList);
+
+        list.setItems(currencyList);
     }
     
-    public void resolveQuery(String inputSymbol, String inputSymbol2){
-        
+    public void resolveQuery(String inputSymbol){
+        /*
         observableList.clear();
         lineChart.setAnimated(false);
         series1.getData().clear();
         series2.getData().clear();
         lineChart.setAnimated(true);
-
+*/
+    	XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+    	
         try{
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
@@ -202,38 +187,13 @@ public class Controller {
                 observableList.add(record);
                 
                 
-                series1.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
+                series.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
              }
             
             rs.close();
             stmt.close();
             
-            Statement stmt2 = conn.createStatement();
-            String Query2 = "SELECT * FROM Pln WHERE symbol='"+inputSymbol2+"'ORDER BY data";
-            
-            ResultSet rs2 = stmt2.executeQuery(Query2);
-            
-            while(rs2.next()){
-                String symbol = rs2.getString(1);
-                String kurs = rs2.getString(2);
-                String data = rs2.getString(3);
-                String czas = rs2.getString(4);
-                String nazwa = rs2.getString(5);
-                
-                Double kursInverted = Double.parseDouble(kurs);
-                kursInverted = 1/kursInverted;
-                
-                Record record = new Record(symbol, kursInverted, data, czas, nazwa);
-                observableList.add(record);
-                
-                
-                series2.getData().add(new XYChart.Data<String, Number>(data+" "+czas, kursInverted));
-             }
-            rs2.close();
-            stmt2.close();
-            
-            series2.setName(inputSymbol2);
-            series1.setName(inputSymbol);
+           lineChart.getData().addAll(series);
             
         }
         catch(Exception e){
@@ -248,11 +208,11 @@ public class Controller {
           xAxis = new CategoryAxis();
           yAxis = new NumberAxis();
           
-          series1 = new XYChart.Series<String, Number>();
-          series2 = new XYChart.Series<String, Number>();
+          //series1 = new XYChart.Series<String, Number>();
+          //series2 = new XYChart.Series<String, Number>();
          
           
-          lineChart.getData().addAll(series2, series1);
+          //lineChart.getData().addAll(series2, series1);
           
       }
 

@@ -7,9 +7,6 @@
 <?import javafx.scene.layout.BorderPane?>
 
 <BorderPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="exrates.client.controller.Controller">
-   <right>
-      <ListView fx:id="listRight" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
-   </right>
    <center>
       <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <columnResizePolicy>
@@ -28,7 +25,7 @@
       </LineChart>
    </bottom>
    <left>
-      <ListView fx:id="listLeft" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="list" prefHeight="200.0" prefWidth="60.0" BorderPane.alignment="CENTER" />
    </left>
    <top>
       <MenuBar BorderPane.alignment="CENTER">

@@ -2,6 +2,7 @@ package exrates.client.controller;
 
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.Vector;
 
 import exrates.client.Client;
 import exrates.client.model.Record;
@@ -31,8 +32,10 @@ import javafx.stage.Stage;
 
 
 public class Controller {
+	
+	private Vector<XYChart.Series<String, Number>> seriesContainer;
     
-    public ObservableList<Record> observableList;
+    private ObservableList<Record> observableList;
     
     @FXML
     public MenuItem clear;
@@ -62,7 +65,8 @@ public class Controller {
     
     public void initialize(){
         
-        
+    	seriesContainer = new Vector<XYChart.Series<String, Number>>() ;
+    	
         observableList = FXCollections.observableArrayList();
         constructCurrencyList();
         constructTable();
@@ -92,19 +96,21 @@ public class Controller {
         close.setOnAction(event->{
             System.exit(0);
         });
-        /*
+        
         clear.setOnAction(event->{
             SelectionModel<String> selected = list.getSelectionModel();
             selected.clearSelection();
             observableList.clear();
             lineChart.setAnimated(false);
-            series1.getData().clear();
-            series2.getData().clear();
+            for(XYChart.Series<String, Number> series : seriesContainer){
+            	series.getData().clear();
+            }
             lineChart.setAnimated(true);
+            lineChart.getData().clear();
             
             
         });
-        */
+        
     }
     
     
@@ -154,20 +160,14 @@ public class Controller {
     }
     
     public void resolveQuery(String inputSymbol){
-        /*
-        observableList.clear();
-        lineChart.setAnimated(false);
-        series1.getData().clear();
-        series2.getData().clear();
-        lineChart.setAnimated(true);
-*/
+        
     	XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
     	
         try{
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data";
+            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data, czas";
             
             ResultSet rs = stmt.executeQuery(Query);
             
@@ -193,6 +193,9 @@ public class Controller {
             rs.close();
             stmt.close();
             
+           series.setName(inputSymbol); 
+           seriesContainer.add(series);
+            
            lineChart.getData().addAll(series);
             
         }
@@ -208,11 +211,7 @@ public class Controller {
           xAxis = new CategoryAxis();
           yAxis = new NumberAxis();
           
-          //series1 = new XYChart.Series<String, Number>();
-          //series2 = new XYChart.Series<String, Number>();
-         
           
-          //lineChart.getData().addAll(series2, series1);
           
       }
 

@@ -107,6 +107,7 @@ public class Controller {
             }
             lineChart.setAnimated(true);
             lineChart.getData().clear();
+            seriesContainer.removeAllElements();
             
             
         });

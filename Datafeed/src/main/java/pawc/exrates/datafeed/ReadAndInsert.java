@@ -1,6 +1,10 @@
 package pawc.exrates.datafeed;
 
 import org.w3c.dom.*;
+
+import pawc.exrates.datafeed.model.Date;
+import pawc.exrates.datafeed.model.Record;
+
 import org.apache.commons.logging.LogFactory;
 
 import java.math.BigDecimal;
@@ -8,9 +12,9 @@ import java.text.DecimalFormat;
 
 import org.apache.commons.logging.Log;
 
-public class ReadDocAndSendToSQL {
+public class ReadAndInsert {
 	
-	public static void read(Document doc){
+	public static void go(Document doc){
 		
 		Log log = LogFactory.getLog("inner class");
 		
@@ -27,27 +31,18 @@ public class ReadDocAndSendToSQL {
 			    continue;
 			}
 			rate=1/rate;
-			String rateDecimalFormat = new DecimalFormat("#0.0000").format(rate);
+			String rateDecimalFormat = new DecimalFormat("#0.00000").format(rate);
+			rateDecimalFormat = rateDecimalFormat.replace(",", ".");
 			String name = nlist.item(i).getChildNodes().item(13).getTextContent();
 			String fullName = nlist.item(i).getChildNodes().item(15).getTextContent();
 			
-			char[] data = nlist.item(i).getFirstChild().getNextSibling()
-					.getNextSibling().getNextSibling().getNextSibling()
-					.getNextSibling().getNextSibling().getNextSibling().getTextContent().toCharArray();
+			String dateInput = nlist.item(i).getChildNodes().item(7).getTextContent();
+			Date date = new Date(dateInput);
 			
-			log.info(name+", "+fullName+", "+rateDecimalFormat);
-			
-			//log.info(kurs+" "+name+" "+dzien+"-"+miesiac+"-"+rok+" "+godzina+" "+fullName);
-			//DBConnection.insert(Main.conn, "PLN", name, kurs.toString(), dataDoTabeli, godzina, fullName);
-			
+			Record record = new Record(name, fullName, date, rateDecimalFormat);
+			DBConnection.insert(Main.conn, Main.dbtable, record);
+
 		}
-	}
-	
-	public static String obrobDzien(String dzien){
-		if(Integer.parseInt(dzien)<10){
-			dzien="0"+dzien;
-		}
-		return dzien;
 	}
 	
 }

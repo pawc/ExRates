@@ -2,11 +2,16 @@ package pawc.exrates.datafeed;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.postgresql.util.PSQLException;
+
+import pawc.exrates.datafeed.model.Record;
 
 public class DBConnection {
 
-	public static Connection connect(String user, String pass){
+	public static Connection connect(String host, String dbname, String user, String pass){
 		Connection conn = null;
 		try{
 			Class.forName("org.postgresql.Driver");
@@ -16,27 +21,36 @@ public class DBConnection {
 			System.exit(-1);
 		}
 		try{
-			conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", user, pass);
+			conn = DriverManager.getConnection("jdbc:postgresql://"+host+":5432/"+dbname, user, pass);
 		}
-		catch(Exception e){
-			System.out.println("Can't connect to the database");
+		catch(PSQLException e){
+			System.out.println("Can't connect to the database"+e.getCause());
 			System.exit(-1);
+		}
+		catch(SQLException e){
+		    System.out.println("Can't connect to the database"+e.getCause());
+            System.exit(-1);
 		}
 		return conn;
 	}
-	
-	public static void insert(Connection conn, String table, String symbol, String kurs, String data, String czas, String nazwa){
-		Statement stmt = null;
-		try{
-			stmt = conn.createStatement();
-			String query = "INSERT INTO "+table+" VALUES ('"+symbol+"', '"+kurs+"', '"+data+"', '"+czas+"', '"+nazwa+"');";
-			System.out.println("Updated positions: "+stmt.executeUpdate(query));
-		}
-		catch(Exception e){
-			System.out.println(e.toString());
-			System.exit(-1);
-		}
+
+	public static void insert(Connection conn, String table, Record record){
+	    Statement stmt = null;
+        try{
+            stmt = conn.createStatement();
+            String query = "INSERT INTO "+table+" VALUES ('"+record.getName()+"', '"
+                    +record.getRate()+"', '"+record.getDateToSQLFormat()+"', '"
+                    +record.getTimeToSQLFormat()+"', '"+record.getFullName()+"');";
+            stmt.executeUpdate(query);
+        }
+        catch(PSQLException e){
+            System.out.println("Error: "+e.toString());
+            System.exit(-1);
+        }
+        catch(Exception e){
+            System.out.println(e.toString());
+            System.exit(-1);
+        }
 	}
-	
 	
 }

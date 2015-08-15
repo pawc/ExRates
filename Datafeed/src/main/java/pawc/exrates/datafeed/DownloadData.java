@@ -9,11 +9,11 @@ import java.io.InputStreamReader;
 
 public class DownloadData {
 
-	public static File download(){
+	public static File download(String symbol){
 		
-		File file = new File("data_last_downloaded.xlm");
+		File file = new File(symbol+".xlm");
 		try{
-		URL url = new URL("http://www.floatrates.com/daily/pln.xml");
+		URL url = new URL("http://www.floatrates.com/daily/"+symbol+".xml");
 		URLConnection urlconn = url.openConnection();
 		BufferedReader bfr = new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
 		FileWriter fw = new FileWriter(file);

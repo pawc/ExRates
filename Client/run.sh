@@ -1,3 +1,3 @@
 mvn clean package
 cd target
-java -jar client-1.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar Client-2.0-jar-with-dependencies.jar 

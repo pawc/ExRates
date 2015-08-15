@@ -6,9 +6,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 
 import java.util.Vector;
+import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,6 +18,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionModel;
@@ -29,7 +32,9 @@ import pawc.exrates.client.model.Record;
 public class Controller {
 	
 	private Vector<XYChart.Series<String, Number>> seriesContainer;
+	private FilteredList<Record> filteredList;
     private ObservableList<Record> observableList;
+    private ObservableList<String> comboboxObservableList;
     @FXML public MenuItem clear;
     @FXML public MenuItem close;
     @FXML public MenuItem about;
@@ -38,18 +43,21 @@ public class Controller {
     @FXML public LineChart<String, Number> lineChart;
     @FXML public TableView table;
     @FXML public ListView list;
+    @FXML public ComboBox combobox;
 
     public void initialize(){
         
-    	seriesContainer = new Vector<XYChart.Series<String, Number>>() ;
+        seriesContainer = new Vector<XYChart.Series<String, Number>>() ;
     	
         observableList = FXCollections.observableArrayList();
+        filteredList = new FilteredList<Record>(observableList);
         constructCurrencyList();
         constructTable();
         createLineChart();
         
         list.setOnMouseClicked(event->{
             SelectionModel<String> selected = list.getSelectionModel();
+            combobox.getItems().add(selected.getSelectedItem());
             resolveQuery(selected.getSelectedItem());
         });
         
@@ -69,11 +77,16 @@ public class Controller {
             stage.show();
         });
         
+        combobox.setOnAction(event->{
+           
+        });
+        
         close.setOnAction(event->{
             System.exit(0);
         });
         
         clear.setOnAction(event->{
+            combobox.getItems().clear();
             SelectionModel<String> selected = list.getSelectionModel();
             selected.clearSelection();
             observableList.clear();
@@ -108,7 +121,7 @@ public class Controller {
         nameCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Name"));
         
         //powiązanie tabeli z observable list
-        table.setItems(observableList);
+        table.setItems(filteredList);
     }
     
     public void constructCurrencyList(){
@@ -155,7 +168,6 @@ public class Controller {
                 Record record = new Record(symbol, rate, data, czas, nazwa);
                 observableList.add(record);
                 
-                
                 series.getData().add(new XYChart.Data<String, Number>(data+" "+czas, rate));
              }
             
@@ -170,6 +182,7 @@ public class Controller {
         }
         catch(Exception e){
             System.out.println(e.toString());
+            e.printStackTrace(System.out);
         }
     }
     

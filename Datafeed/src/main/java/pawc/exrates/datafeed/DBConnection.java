@@ -42,6 +42,7 @@ public class DBConnection {
                     +record.getRate()+"', '"+record.getDateToSQLFormat()+"', '"
                     +record.getTimeToSQLFormat()+"', '"+record.getFullName()+"');";
             stmt.executeUpdate(query);
+            stmt.close();
         }
         catch(PSQLException e){
             System.out.println("Error: "+e.toString());

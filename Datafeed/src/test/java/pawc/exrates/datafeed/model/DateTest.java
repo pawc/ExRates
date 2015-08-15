@@ -19,11 +19,11 @@ public class DateTest
 
     public void testDate()
     {
-       String input = "Sat, 15 Aug 2015 12:00:01 GMT";
+       String input = "Sat, 8 Aug 2015 12:00:01 GMT";
        Date date = new Date(input);
        assertTrue(date.getYear().equals("2015"));
        assertTrue(date.getMonth().equals("Aug"));
-       assertTrue(date.getDay().equals("15"));
+       assertTrue(date.getDay().equals("8"));
        assertTrue(date.getHour().equals("12"));
        assertTrue(date.getMinutes().equals("00"));
        assertTrue(date.getSeconds().equals("01"));

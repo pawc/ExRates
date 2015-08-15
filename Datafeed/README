@@ -1,0 +1,5 @@
+run command from target/
+example:
+java -jar Datafeed-2.0-jar-with-dependencies.jar host dbname user pass table symbol
+
+check wiki for valid table structure

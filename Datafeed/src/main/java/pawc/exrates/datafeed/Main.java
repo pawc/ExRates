@@ -17,8 +17,14 @@ public class Main {
 	public static String dbtable;
 	
 	public static void main(String[] args){
-		
-		Log log = LogFactory.getLog("Main program");
+	    
+	    Log log = LogFactory.getLog("Main program");
+	    
+	    if(args.length!=6){
+	        log.error("Pass valid parameters - check readme");
+	        System.exit(-1);
+	    }
+	    
 		conn = DBConnection.connect(args[0], args[1], args[2], args[3]);
 		dbtable = args[4];
 		

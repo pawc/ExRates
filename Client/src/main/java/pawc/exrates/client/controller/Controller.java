@@ -62,7 +62,7 @@ public class Controller {
         initBaseCmb();
         
         list.setOnMouseClicked(event->{
-            currencListAction();
+            currencyListAction();
         });
         
         about.setOnAction(event->{
@@ -84,18 +84,23 @@ public class Controller {
         clear.setOnAction(event->{
             clear();
         });
-        
     }
 
     private void initBaseCmb() {
         baseCombobox.getItems().add("PLN");
         baseCombobox.getItems().add("EUR");
         baseCombobox.getItems().add("USD");
+        baseCombobox.getItems().add("GBP");
+        baseCombobox.getItems().add("SEK");
+        baseCombobox.getItems().add("CHF");
+        baseCombobox.getItems().add("CNY");
+        baseCombobox.getItems().add("RUB");
         baseCombobox.setValue("PLN");
     }
 
-    private void currencListAction() {
+    private void currencyListAction() {
         SelectionModel<String> selected = list.getSelectionModel();
+        if(filterCombobox.getItems().contains(selected.getSelectedItem())) return;
         if(!filterCombobox.getItems().contains("ALL")) filterCombobox.getItems().add("ALL");
         filterCombobox.setValue("ALL");
         filterCombobox.getItems().add(selected.getSelectedItem());

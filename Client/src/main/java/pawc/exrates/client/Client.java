@@ -15,12 +15,10 @@ public class Client extends Application {
 	public void start(Stage primaryStage) throws IOException {
 	    
 	    BorderPane borderPane = (BorderPane) FXMLLoader.load(ClassLoader.getSystemResource("exrates/client/MainView.fxml"));
-	    primaryStage.setTitle("ExRates - exchange rates for PLN, EUR and USD");
+	    primaryStage.setTitle("ExRates - exchange rates");
 	    Scene scene = new Scene(borderPane);
 	    primaryStage.setScene(scene);
 	    primaryStage.show();
-	    
-		
 	}
 
 	public static void main(String[] args) {

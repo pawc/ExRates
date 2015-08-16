@@ -6,7 +6,7 @@ day.
 Usage
 -------
 1. git clone it
-2. run client/run.sh from within the client root directory
+2. run Client/run.sh from within the client root directory
 
 The script require [Maven](https://maven.apache.org/) and JDK 1.8
 

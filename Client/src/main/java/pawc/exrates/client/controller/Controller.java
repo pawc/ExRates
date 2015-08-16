@@ -19,6 +19,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -35,56 +36,45 @@ public class Controller {
     private String baseCurrency = "PLN";
 	private Vector<XYChart.Series<String, Number>> seriesContainer;
 	private FilteredList<Record> filteredList;
+	private ObservableList<String> currencyList;
     private ObservableList<Record> observableList;
-    private ObservableList<String> comboboxObservableList;
-    @FXML public MenuItem clear;
-    @FXML public MenuItem close;
-    @FXML public MenuItem about;
-    @FXML public CategoryAxis xAxis;
-    @FXML public NumberAxis yAxis;
-    @FXML public LineChart<String, Number> lineChart;
-    @FXML public TableView table;
-    @FXML public ListView list;
-    @FXML public ComboBox combobox;
+    @FXML private MenuItem clear;
+    @FXML private MenuItem close;
+    @FXML private MenuItem about;
+    @FXML private CategoryAxis xAxis;
+    @FXML private NumberAxis yAxis;
+    @FXML private LineChart<String, Number> lineChart;
+    @FXML private TableView table;
+    @FXML private ListView list;
+    @FXML private ComboBox filterCombobox;
+    @FXML private ComboBox baseCombobox;
+    @FXML private Button clearButton;
 
     public void initialize(){
         
         seriesContainer = new Vector<XYChart.Series<String, Number>>() ;
-    	
-        observableList = FXCollections.observableArrayList();
+    	observableList = FXCollections.observableArrayList();
         
         constructCurrencyList();
         constructTable();
         createLineChart();
         
+        initBaseCmb();
+        
         list.setOnMouseClicked(event->{
-            SelectionModel<String> selected = list.getSelectionModel();
-            if(!combobox.getItems().contains("ALL")) combobox.getItems().add("ALL");
-            combobox.setValue("ALL");
-            combobox.getItems().add(selected.getSelectedItem());
-            resolveQuery(selected.getSelectedItem());
-            
-            
+            currencListAction();
         });
         
         about.setOnAction(event->{
-            AnchorPane anchorPane = null;
-            try {
-                anchorPane = (AnchorPane) FXMLLoader.load(ClassLoader.getSystemResource("exrates/client/About.fxml"));
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            
-            Scene scene = new Scene(anchorPane);
-            Stage stage = new Stage();
-            stage.setTitle("About");
-            stage.setScene(scene);
-            stage.show();
+            showAboutPane();
         });
         
-        combobox.setOnAction(event->{
-           
+        clearButton.setOnAction(event->{
+            clear();
+        });
+        
+        baseCombobox.setOnAction(event->{
+            baseCurrencyCmbAction();
         });
         
         close.setOnAction(event->{
@@ -92,19 +82,60 @@ public class Controller {
         });
         
         clear.setOnAction(event->{
-            combobox.getItems().clear();
-            SelectionModel<String> selected = list.getSelectionModel();
-            selected.clearSelection();
-            observableList.clear();
-            lineChart.setAnimated(false);
-            for(XYChart.Series<String, Number> series : seriesContainer){
-            	series.getData().clear();
-            }
-            lineChart.setAnimated(true);
-            lineChart.getData().clear();
-            seriesContainer.removeAllElements();
+            clear();
         });
         
+    }
+
+    private void initBaseCmb() {
+        baseCombobox.getItems().add("PLN");
+        baseCombobox.getItems().add("EUR");
+        baseCombobox.getItems().add("USD");
+        baseCombobox.setValue("PLN");
+    }
+
+    private void currencListAction() {
+        SelectionModel<String> selected = list.getSelectionModel();
+        if(!filterCombobox.getItems().contains("ALL")) filterCombobox.getItems().add("ALL");
+        filterCombobox.setValue("ALL");
+        filterCombobox.getItems().add(selected.getSelectedItem());
+        resolveQuery(selected.getSelectedItem());
+    }
+
+    private void baseCurrencyCmbAction() {
+        currencyList.clear();
+        clear();
+        baseCurrency = baseCombobox.getValue().toString();
+        constructCurrencyList();
+    }
+
+    private void showAboutPane() {
+        AnchorPane anchorPane = null;
+        try {
+            anchorPane = (AnchorPane) FXMLLoader.load(ClassLoader.getSystemResource("exrates/client/About.fxml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        Scene scene = new Scene(anchorPane);
+        Stage stage = new Stage();
+        stage.setTitle("About");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void clear() {
+        filterCombobox.getItems().clear();
+        SelectionModel<String> selected = list.getSelectionModel();
+        selected.clearSelection();
+        observableList.clear();
+        lineChart.setAnimated(false);
+        for(XYChart.Series<String, Number> series : seriesContainer){
+        	series.getData().clear();
+        }
+        lineChart.setAnimated(true);
+        lineChart.getData().clear();
+        seriesContainer.removeAllElements();
     }
     
     public void constructTable(){
@@ -128,7 +159,7 @@ public class Controller {
         
         filteredList = new FilteredList<Record>(observableList);
         
-        combobox.valueProperty().addListener((observable, oldValue, newValue)->{
+        filterCombobox.valueProperty().addListener((observable, oldValue, newValue)->{
            
             filteredList.setPredicate(record -> {
                 // If filter text is empty, display all
@@ -147,14 +178,13 @@ public class Controller {
             });
            });    
       
-        
         SortedList<Record> sortedData = new SortedList<>(filteredList);
         sortedData.comparatorProperty().bind(table.comparatorProperty());
         table.setItems(sortedData);
     }
     
     public void constructCurrencyList(){
-        ObservableList<String> currencyList = FXCollections.observableArrayList();
+        currencyList = FXCollections.observableArrayList();
         try{
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
@@ -181,7 +211,7 @@ public class Controller {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT * FROM "+baseCurrency+" WHERE symbol='"+inputSymbol+"'ORDER BY data, czas";
+            String Query = "SELECT * FROM "+baseCurrency+" WHERE symbol='"+inputSymbol+"'ORDER BY date, time";
             
             ResultSet rs = stmt.executeQuery(Query);
             

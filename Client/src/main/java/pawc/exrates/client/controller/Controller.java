@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -31,6 +32,7 @@ import pawc.exrates.client.model.Record;
 
 public class Controller {
 	
+    private String baseCurrency = "PLN";
 	private Vector<XYChart.Series<String, Number>> seriesContainer;
 	private FilteredList<Record> filteredList;
     private ObservableList<Record> observableList;
@@ -50,15 +52,19 @@ public class Controller {
         seriesContainer = new Vector<XYChart.Series<String, Number>>() ;
     	
         observableList = FXCollections.observableArrayList();
-        filteredList = new FilteredList<Record>(observableList);
+        
         constructCurrencyList();
         constructTable();
         createLineChart();
         
         list.setOnMouseClicked(event->{
             SelectionModel<String> selected = list.getSelectionModel();
+            if(!combobox.getItems().contains("ALL")) combobox.getItems().add("ALL");
+            combobox.setValue("ALL");
             combobox.getItems().add(selected.getSelectedItem());
             resolveQuery(selected.getSelectedItem());
+            
+            
         });
         
         about.setOnAction(event->{
@@ -114,14 +120,37 @@ public class Controller {
         table.getColumns().addAll(symbolCol, dateCol, timeCol, rateCol, nameCol);
         
         //powiązanie kolumn z modelem
-        symbolCol.setCellValueFactory( new PropertyValueFactory<Record,String>("Symbol"));
+        symbolCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Symbol"));
         dateCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Time"));
         rateCol.setCellValueFactory(new PropertyValueFactory<Record,Double>("Rate"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Record,String>("Name"));
         
-        //powiązanie tabeli z observable list
-        table.setItems(filteredList);
+        filteredList = new FilteredList<Record>(observableList);
+        
+        combobox.valueProperty().addListener((observable, oldValue, newValue)->{
+           
+            filteredList.setPredicate(record -> {
+                // If filter text is empty, display all
+                if (newValue == null) {
+                    return true;
+                }
+                
+                if(newValue.toString().contains("ALL")){
+                    return true;
+                }
+
+                if (record.getSymbol().contains(newValue.toString())) {
+                    return true; 
+                }
+                return false; 
+            });
+           });    
+      
+        
+        SortedList<Record> sortedData = new SortedList<>(filteredList);
+        sortedData.comparatorProperty().bind(table.comparatorProperty());
+        table.setItems(sortedData);
     }
     
     public void constructCurrencyList(){
@@ -130,7 +159,7 @@ public class Controller {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT DISTINCT SYMBOL FROM PLN ORDER BY SYMBOL";
+            String Query = "SELECT DISTINCT SYMBOL FROM "+baseCurrency+" ORDER BY SYMBOL";
             ResultSet rs = stmt.executeQuery(Query);
             while(rs.next()){
                 String symbol = rs.getString(1);
@@ -152,7 +181,7 @@ public class Controller {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
-            String Query = "SELECT * FROM Pln WHERE symbol='"+inputSymbol+"'ORDER BY data, czas";
+            String Query = "SELECT * FROM "+baseCurrency+" WHERE symbol='"+inputSymbol+"'ORDER BY data, czas";
             
             ResultSet rs = stmt.executeQuery(Query);
             

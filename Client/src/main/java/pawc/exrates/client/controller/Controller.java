@@ -192,7 +192,7 @@ public class Controller {
         currencyList = FXCollections.observableArrayList();
         try{
             Class.forName("org.postgresql.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
+            Connection conn = DriverManager.getConnection("jdbc:postgresql://kritsit.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
             String Query = "SELECT DISTINCT SYMBOL FROM "+baseCurrency+" ORDER BY SYMBOL";
             ResultSet rs = stmt.executeQuery(Query);
@@ -214,7 +214,7 @@ public class Controller {
     	
         try{
             Class.forName("org.postgresql.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://pawc.ddns.net:5432/postgres", "xml", "xml");
+            Connection conn = DriverManager.getConnection("jdbc:postgresql://kritsit.ddns.net:5432/postgres", "xml", "xml");
             Statement stmt = conn.createStatement();
             String Query = "SELECT * FROM "+baseCurrency+" WHERE symbol='"+inputSymbol+"'ORDER BY date, time";
             

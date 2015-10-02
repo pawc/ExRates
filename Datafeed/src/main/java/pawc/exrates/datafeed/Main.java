@@ -28,17 +28,17 @@ public class Main {
 		conn = DBConnection.connect(args[0], args[1], args[2], args[3]);
 		dbtable = args[4];
 		
-	while(true){
+//	while(true){
 		ReadAndInsert.go(FileParser.parse(DownloadData.download(args[5])));
 	
-		try{
-			log.info("Done with this batch");
-			TimeUnit.HOURS.sleep(12);
+//		try{
+//			log.info("Done with this batch");
+//			TimeUnit.HOURS.sleep(12);
 			
+//		}
+//		catch(Exception e){
+//		    System.exit(-1);}
 		}
-		catch(Exception e){
-		    System.exit(-1);}
-		}
-	}
+//	}
 	
 }

@@ -1,0 +1,41 @@
+# Maintainer: pawc <pswid89@gmail.com>
+pkgname=java-exrates
+pkgver=2
+pkgrel=1
+epoch=
+pkgdesc="Plotting current exchange rates for given currencies"
+arch=('x86_64')
+url=""
+license=('GPLv2')
+groups=()
+depends=('java-runtime')
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("http://kritsit.ddns.net/$pkgname.tar.gz")
+noextract=()
+md5sums=('81c3478d2706c5754d6784c7625ec211')
+validpgpkeys=()
+
+build() {
+	cd "$pkgname"
+}
+
+package() {
+	cd "$pkgname"
+
+	install -d "$pkgdir/usr/share/java/java-exrates"
+	install -m755 "$srcdir/$pkgname/usr/share/java/java-exrates/Client-2.0-jar-with-dependencies.jar" \
+	"$pkgdir/usr/share/java/java-exrates"
+
+	install -d "$pkgdir/usr/local/bin"
+	install -m755 "$srcdir/$pkgname/usr/local/bin/exrates" \
+	"$pkgdir/usr/local/bin/"
+}
